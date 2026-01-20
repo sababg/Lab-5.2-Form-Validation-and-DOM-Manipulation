@@ -109,22 +109,32 @@ confirmPassword.addEventListener("input", (e) => {
 registrationForm.addEventListener("submit", (event) => {
   event.preventDefault();
 
-  const isUsernameValid = validateUsername(username); // use the  document.getElementById
-  // **********or we can use The document.getElementById, Means we can use username instead of registrationForm.elements.username**************
-  const isEmailValid = validateEmail(registrationForm.elements.email); // used the name of the input, and it's not really safe to use
-  const isPasswordValid = validatePassword(registrationForm.elements.password);
-  const isConfirmPasswordValid = validateConfirmPassword(
-    registrationForm.elements.confirmPassword,
-  );
-
-  if (
-    isUsernameValid &&
-    isEmailValid &&
-    isPasswordValid &&
-    isConfirmPasswordValid
-  ) {
-    alert("Registration successful");
-    localStorage.setItem("username", username.value);
-    registrationForm.reset();
+  if (finalValidation.find((item) => !item.isValid)) {
+    finalValidation.find((item) => !item.isValid).name.focus;
+    return;
   }
+  alert("Registration successful");
+  localStorage.setItem("username", username.value);
+  registrationForm.reset();
 });
+
+const finalValidation = [
+  {
+    name: username,
+    isValid: validateUsername(username), // use the  document.getElementById
+  },
+  // **********or we can use The document.getElementById, Means we can use username instead of registrationForm.elements.username**************
+
+  {
+    name: email,
+    isValid: validateEmail(registrationForm.elements.email), // used the name of the input, and it's not really safe to use
+  },
+  {
+    name: username,
+    isValid: validatePassword(registrationForm.elements.password),
+  },
+  {
+    name: username,
+    isValid: validateConfirmPassword(registrationForm.elements.confirmPassword),
+  },
+];
