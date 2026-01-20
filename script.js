@@ -20,6 +20,9 @@ const validateUsername = (input) => {
   if (input.validity.valueMissing) {
     usernameError.textContent = "This field is required.";
     return false;
+  } else if (input.value.length < 3) {
+    usernameError.textContent = "username must be at least 3 characters long.";
+    return false;
   } else {
     usernameError.textContent = "";
     return true;
@@ -105,36 +108,42 @@ confirmPassword.addEventListener("input", (e) => {
   validateConfirmPassword(input);
 });
 
-//Form submission
-registrationForm.addEventListener("submit", (event) => {
-  event.preventDefault();
-
-  if (finalValidation.find((item) => !item.isValid)) {
-    finalValidation.find((item) => !item.isValid).name.focus;
-    return;
-  }
-  alert("Registration successful");
-  localStorage.setItem("username", username.value);
-  registrationForm.reset();
-});
-
+//Final validation
 const finalValidation = [
   {
     name: username,
-    isValid: validateUsername(username), // use the  document.getElementById
+    isValid: () => validateUsername(username), // use the  document.getElementById
   },
   // **********or we can use The document.getElementById, Means we can use username instead of registrationForm.elements.username**************
 
   {
     name: email,
-    isValid: validateEmail(registrationForm.elements.email), // used the name of the input, and it's not really safe to use
+    isValid: () => validateEmail(registrationForm.elements.email), // used the name of the input, and it's not really safe to use
   },
   {
-    name: username,
-    isValid: validatePassword(registrationForm.elements.password),
+    name: password,
+    isValid: () => validatePassword(registrationForm.elements.password),
   },
   {
-    name: username,
-    isValid: validateConfirmPassword(registrationForm.elements.confirmPassword),
+    name: confirmPassword,
+    isValid: () =>
+      validateConfirmPassword(registrationForm.elements.confirmPassword),
   },
 ];
+
+//Form submission
+registrationForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+
+  if (finalValidation.find((item) => !item.isValid())) {
+    finalValidation.find((item) => !item.isValid()).name.focus();
+    return;
+  }
+  alert("Registration successful");
+  try {
+    localStorage.setItem("username", username.value);
+  } catch (error) {
+    console.warn("localStorage unavailable:", error);
+  }
+  registrationForm.reset();
+});
